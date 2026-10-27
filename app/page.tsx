@@ -300,7 +300,6 @@ export default function Home() {
           />
         </div>
         <p>Compatibility data is provided as a publisher convenience. Validate versions in your release workflow.</p>
-        {data && <a href={data.source} target="_blank" rel="noreferrer">Source config <ExternalLink size={13} /></a>}
       </footer>
     </main>
   );

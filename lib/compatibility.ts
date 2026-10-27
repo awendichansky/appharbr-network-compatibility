@@ -41,7 +41,6 @@ export type CompatibilityResponse = {
   networkCount: number;
   supportedNetworkCount: number;
   networks: NetworkCompatibility[];
-  source: string;
 };
 
 const CONFIG_URLS: Record<Platform, string> = {
@@ -216,6 +215,5 @@ export async function getCompatibility(
     networkCount: networks.length,
     supportedNetworkCount: networks.filter((network) => network.supported).length,
     networks,
-    source,
   };
 }
