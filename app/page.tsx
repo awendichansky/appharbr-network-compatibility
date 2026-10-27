@@ -247,8 +247,8 @@ export default function Home() {
                 <tr>
                   <th>Ad network</th>
                   <th>Supported network versions</th>
-                  <th>Latest tested</th>
                   <th>Introduced in AppHarbr</th>
+                  <th>Top supported version</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -257,8 +257,8 @@ export default function Home() {
                   <tr key={network.id}>
                     <td><div className="network-name"><NetworkMark name={network.name} /><div><strong>{network.name}</strong><span>{network.id}</span></div></div></td>
                     <td><RangeCell network={network} /></td>
-                    <td className="mono-value">{network.latestTestedAdapter ?? "—"}</td>
                     <td className="mono-value">{network.minimumAppHarbrForLatest ?? "—"}</td>
+                    <td className="mono-value top-supported">{network.topSupportedAdapter ?? "—"}</td>
                     <td>{network.supported ? <span className="status-badge"><Check size={13} /> Supported</span> : <span className="status-badge muted">Unavailable</span>}</td>
                   </tr>
                 ))}

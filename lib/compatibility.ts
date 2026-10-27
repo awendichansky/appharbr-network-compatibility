@@ -25,6 +25,7 @@ export type NetworkCompatibility = {
   supported: boolean;
   supportedRange: { min: string; max: string } | null;
   latestTestedAdapter: string | null;
+  topSupportedAdapter: string | null;
   minimumAppHarbrForLatest: string | null;
   versionAnchors: SupportEntry[];
 };
@@ -187,6 +188,7 @@ export async function getCompatibility(
         (entry) => compareVersions(entry.minimumAppHarbrVersion, requestedSdkVersion) <= 0,
       );
       const latest = eligible.at(-1) ?? null;
+      const topSupported = entries.at(-1) ?? null;
       return {
         id,
         name: DISPLAY_NAMES[id.toLocaleLowerCase()] ?? id,
@@ -196,6 +198,7 @@ export async function getCompatibility(
             ? { min: eligible[0].adapterVersion, max: latest!.adapterVersion }
             : null,
         latestTestedAdapter: latest?.adapterVersion ?? null,
+        topSupportedAdapter: topSupported?.adapterVersion ?? null,
         minimumAppHarbrForLatest: latest?.minimumAppHarbrVersion ?? null,
         versionAnchors: entries,
       } satisfies NetworkCompatibility;
