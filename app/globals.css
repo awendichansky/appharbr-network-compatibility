@@ -95,6 +95,10 @@ tbody tr:hover { background: #fbfcff; }
 .api-card { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 20px; margin-top: 22px; padding: 25px 28px; border: 1px solid #e3d1eb; border-radius: 15px; background: linear-gradient(105deg, #fbf8fd 0%, #f4eafa 100%); }
 .api-icon { width: 52px; height: 52px; display: grid; place-items: center; color: #fff; border-radius: 12px; background: linear-gradient(135deg, #4200b9, #b02493); font: 720 16px ui-monospace, SFMono-Regular, Menlo, monospace; }
 .api-card code { display: inline-block; margin-top: 12px; padding: 7px 9px; border: 1px solid #d9e2f4; border-radius: 6px; color: #24436f; background: rgba(255,255,255,.7); font-size: 11px; }
+.api-examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.api-examples > div { display: grid; gap: 4px; }
+.api-examples span { color: var(--muted); font-size: 10px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
+.api-examples code { margin-top: 0; }
 .api-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
 .api-actions button, .api-actions a { height: 36px; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 0 15px; border: 1px solid #c9d4e9; border-radius: 8px; color: var(--blue); background: #fff; font-size: 12px; font-weight: 720; cursor: pointer; }
 .api-actions button { color: #fff; border-color: var(--blue); background: var(--blue); }

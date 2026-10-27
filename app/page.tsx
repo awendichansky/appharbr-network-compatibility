@@ -115,6 +115,7 @@ export default function Home() {
     const params = new URLSearchParams({ platform });
     return `/api/compatibility?${params}`;
   }, [platform]);
+  const apiSdkPath = `${apiPath}&sdk=${encodeURIComponent(sdkVersion || "VERSION")}`;
 
   async function copyApiUrl() {
     await navigator.clipboard.writeText(`${window.location.origin}${apiPath}`);
@@ -276,7 +277,10 @@ export default function Home() {
             <span className="section-kicker">For automation</span>
             <h2>Use the normalized JSON API</h2>
             <p>Pass only a platform to retrieve every network and its complete version history. Add an optional <strong>sdk</strong> parameter for a point-in-time compatibility result.</p>
-            <code>GET {apiPath}</code>
+            <div className="api-examples">
+              <div><span>All versions</span><code>GET {apiPath}</code></div>
+              <div><span>Specific SDK</span><code>GET {apiSdkPath}</code></div>
+            </div>
           </div>
           <div className="api-actions">
             <button onClick={copyApiUrl}>{copied ? <Check size={16} /> : <Clipboard size={16} />}{copied ? "Copied" : "Copy request"}</button>
@@ -286,7 +290,7 @@ export default function Home() {
 
         <div className="method-note">
           <strong>How to read this table</strong>
-          <p>The range spans the earliest through latest adapter version listed as compatible at or before the selected AppHarbr SDK version. Source data is read from AppHarbr’s live platform configs and normalized because the two OS formats use different field names.</p>
+          <p>The range spans the earliest through latest adapter version listed as compatible at or before the selected AppHarbr SDK version. Top supported version is the highest adapter version available for that network.</p>
         </div>
       </section>
 
