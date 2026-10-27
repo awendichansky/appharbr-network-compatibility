@@ -48,6 +48,10 @@ const CONFIG_URLS: Record<Platform, string> = {
   android: "https://gw.geoedge.be/api/sdk_config/android",
 };
 
+const EXCLUDED_SDK_VERSIONS: Partial<Record<Platform, Set<string>>> = {
+  android: new Set(["2.90.0"]),
+};
+
 const DISPLAY_NAMES: Record<string, string> = {
   adcolony: "AdColony",
   admob: "AdMob",
@@ -153,17 +157,30 @@ export async function getCompatibility(
   const normalized = Object.entries(support)
     .map(([id, entries]) => ({ id, entries: normalizeEntries(entries ?? []) }))
     .filter((network) => network.entries.length > 0);
+  const excludedSdkVersions = EXCLUDED_SDK_VERSIONS[platform] ?? new Set<string>();
+  const visibleNetworks = normalized.map(({ id, entries }) => ({
+    id,
+    entries: entries.filter(
+      (entry) => !excludedSdkVersions.has(entry.minimumAppHarbrVersion),
+    ),
+  }));
   const sdkVersions = Array.from(
-    new Set(normalized.flatMap((network) => network.entries.map((entry) => entry.minimumAppHarbrVersion))),
+    new Set(visibleNetworks.flatMap((network) => network.entries.map((entry) => entry.minimumAppHarbrVersion))),
   ).sort(compareVersions);
-  if (raw.sdk_latest_version) sdkVersions.push(raw.sdk_latest_version);
+  if (raw.sdk_latest_version && !excludedSdkVersions.has(raw.sdk_latest_version)) {
+    sdkVersions.push(raw.sdk_latest_version);
+  }
   const availableSdkVersions = Array.from(new Set(sdkVersions)).sort(compareVersions);
   const derivedLatest = availableSdkVersions.at(-1) ?? "0.0.0";
   const latestReferencedSdkVersion = raw.sdk_latest_version ?? derivedLatest;
-  const requestedSdkVersion = requestedSdk?.trim() || latestReferencedSdkVersion;
+  const requested = requestedSdk?.trim();
+  const requestedSdkVersion =
+    requested && !excludedSdkVersions.has(requested)
+      ? requested
+      : latestReferencedSdkVersion;
 
   const filter = networkFilter?.trim().toLocaleLowerCase();
-  const networks = normalized
+  const networks = visibleNetworks
     .filter(({ id }) => !filter || id.toLocaleLowerCase() === filter || (DISPLAY_NAMES[id.toLocaleLowerCase()] ?? id).toLocaleLowerCase() === filter)
     .map(({ id, entries }) => {
       const eligible = entries.filter(

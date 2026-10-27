@@ -11,7 +11,6 @@ import {
   RefreshCw,
   Search,
   ShieldCheck,
-  Smartphone,
 } from "lucide-react";
 import type { CompatibilityResponse, NetworkCompatibility, Platform } from "@/lib/compatibility";
 
@@ -55,6 +54,18 @@ function RangeCell({ network }: { network: NetworkCompatibility }) {
       {!single && <span className="range-dash">—</span>}
       {!single && <span className="version-chip latest">{network.supportedRange.max}</span>}
     </div>
+  );
+}
+
+function PlatformIcon({ platform, active }: { platform: Platform; active: boolean }) {
+  const color = active ? "5B16C5" : "7C7187";
+  return (
+    <img
+      className="platform-icon"
+      src={`https://cdn.simpleicons.org/${platform === "ios" ? "apple" : "android"}/${color}`}
+      alt=""
+      aria-hidden="true"
+    />
   );
 }
 
@@ -116,8 +127,11 @@ export default function Home() {
     <main>
       <header className="site-header">
         <a className="brand" href="#top" aria-label="AppHarbr compatibility home">
-          <span className="brand-mark"><span /></span>
-          <span>AppHarbr</span>
+          <img
+            className="official-logo"
+            src="https://appharbr.com/wp-content/uploads/2022/09/APPHARBR-LOGO-COLOR-ON-WHITE-RGB-medium-copy-2.png"
+            alt="AppHarbr by GeoEdge"
+          />
         </a>
         <div className="header-right">
           <span className="live-pill"><span /> Live configuration</span>
@@ -144,7 +158,8 @@ export default function Home() {
                 role="tab"
                 aria-selected={platform === item}
               >
-                <Smartphone size={16} /> {item === "ios" ? "iOS" : "Android"}
+                <PlatformIcon platform={item} active={platform === item} />
+                {item === "ios" ? "iOS" : "Android"}
               </button>
             ))}
           </div>
@@ -277,7 +292,13 @@ export default function Home() {
       </section>
 
       <footer>
-        <div><span className="brand-mark small"><span /></span><strong>AppHarbr</strong></div>
+        <div>
+          <img
+            className="official-logo footer-logo"
+            src="https://appharbr.com/wp-content/uploads/2022/09/APPHARBR-LOGO-COLOR-ON-WHITE-RGB-medium-copy-2.png"
+            alt="AppHarbr by GeoEdge"
+          />
+        </div>
         <p>Compatibility data is provided as a publisher convenience. Validate versions in your release workflow.</p>
         {data && <a href={data.source} target="_blank" rel="noreferrer">Source config <ExternalLink size={13} /></a>}
       </footer>

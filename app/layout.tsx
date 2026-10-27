@@ -6,8 +6,8 @@ export const metadata: Metadata = {
   description:
     "Live Android and iOS ad network version compatibility by AppHarbr SDK version.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "https://appharbr.geoedge.com/favicon.ico",
+    shortcut: "https://appharbr.geoedge.com/favicon.ico",
   },
 };
 
