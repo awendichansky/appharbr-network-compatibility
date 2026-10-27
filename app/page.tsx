@@ -113,9 +113,8 @@ export default function Home() {
 
   const apiPath = useMemo(() => {
     const params = new URLSearchParams({ platform });
-    if (sdkVersion) params.set("sdk", sdkVersion);
     return `/api/compatibility?${params}`;
-  }, [platform, sdkVersion]);
+  }, [platform]);
 
   async function copyApiUrl() {
     await navigator.clipboard.writeText(`${window.location.origin}${apiPath}`);
@@ -247,8 +246,8 @@ export default function Home() {
                 <tr>
                   <th>Ad network</th>
                   <th>Supported network versions</th>
-                  <th>Introduced in AppHarbr</th>
                   <th>Top supported version</th>
+                  <th>Introduced in AppHarbr</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -257,8 +256,8 @@ export default function Home() {
                   <tr key={network.id}>
                     <td><div className="network-name"><NetworkMark name={network.name} /><div><strong>{network.name}</strong><span>{network.id}</span></div></div></td>
                     <td><RangeCell network={network} /></td>
-                    <td className="mono-value">{network.minimumAppHarbrForLatest ?? "—"}</td>
                     <td className="mono-value top-supported">{network.topSupportedAdapter ?? "—"}</td>
+                    <td className="mono-value">{network.minimumAppHarbrForLatest ?? "—"}</td>
                     <td>{network.supported ? <span className="status-badge"><Check size={13} /> Supported</span> : <span className="status-badge muted">Unavailable</span>}</td>
                   </tr>
                 ))}
@@ -276,7 +275,7 @@ export default function Home() {
           <div className="api-copy">
             <span className="section-kicker">For automation</span>
             <h2>Use the normalized JSON API</h2>
-            <p>Pass a platform and AppHarbr SDK version to retrieve the same compatibility result programmatically.</p>
+            <p>Pass only a platform to retrieve every network and its complete version history. Add an optional <strong>sdk</strong> parameter for a point-in-time compatibility result.</p>
             <code>GET {apiPath}</code>
           </div>
           <div className="api-actions">
