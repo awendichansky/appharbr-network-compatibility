@@ -43,7 +43,7 @@ Re-read the Site with `mcp__codex_apps__sites_get_site` before any hosting or ac
   1. Ad network
   2. Supported network versions
   3. Top supported version
-  4. Introduced in AppHarbr
+  4. AppHarbr minimum version
   5. Status
 - `Top supported version` means the highest adapter version present for that network across all visible AppHarbr anchors, independent of the selected SDK.
 - The selected-version supported range is the lowest through highest eligible adapter anchor at or before the selected AppHarbr SDK.

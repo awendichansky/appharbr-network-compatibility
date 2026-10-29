@@ -248,7 +248,7 @@ export default function Home() {
                   <th>Ad network</th>
                   <th>Supported network versions</th>
                   <th>Top supported version</th>
-                  <th>Introduced in AppHarbr</th>
+                  <th>AppHarbr minimum version</th>
                   <th>Status</th>
                 </tr>
               </thead>
