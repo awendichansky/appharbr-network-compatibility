@@ -12,7 +12,12 @@ import {
   Search,
   ShieldCheck,
 } from "lucide-react";
-import type { CompatibilityResponse, NetworkCompatibility, Platform } from "@/lib/compatibility";
+import type {
+  CompatibilityApiResponse,
+  NetworkCompatibility,
+  Platform,
+  UnityNetworkCompatibility,
+} from "@/lib/compatibility";
 
 function formatDate(value: string | null): string {
   if (!value) return "Not provided by source";
@@ -43,8 +48,8 @@ function NetworkMark({ name }: { name: string }) {
   );
 }
 
-function RangeCell({ network }: { network: NetworkCompatibility }) {
-  if (!network.supported || !network.supportedRange) {
+function RangeCell({ network }: { network: NetworkCompatibility | null }) {
+  if (!network?.supported || !network.supportedRange) {
     return <span className="unsupported">Not yet supported</span>;
   }
   const single = network.supportedRange.min === network.supportedRange.max;
@@ -59,20 +64,37 @@ function RangeCell({ network }: { network: NetworkCompatibility }) {
 
 function PlatformIcon({ platform, active }: { platform: Platform; active: boolean }) {
   const color = active ? "5B16C5" : "7C7187";
+  const icon = platform === "ios" ? "apple" : platform === "android" ? "android" : "unity";
   return (
     <img
       className="platform-icon"
-      src={`https://cdn.simpleicons.org/${platform === "ios" ? "apple" : "android"}/${color}`}
+      src={`https://cdn.simpleicons.org/${icon}/${color}`}
       alt=""
       aria-hidden="true"
     />
   );
 }
 
+function platformLabel(platform: Platform): string {
+  if (platform === "ios") return "iOS";
+  if (platform === "android") return "Android";
+  return "Unity";
+}
+
+function UnityStatus({ network }: { network: UnityNetworkCompatibility }) {
+  const android = Boolean(network.android?.supported);
+  const ios = Boolean(network.ios?.supported);
+  if (android && ios) return <span className="status-badge"><Check size={13} /> Both OS</span>;
+  if (android || ios) {
+    return <span className="status-badge partial"><Check size={13} /> {android ? "Android only" : "iOS only"}</span>;
+  }
+  return <span className="status-badge muted">Unavailable</span>;
+}
+
 export default function Home() {
   const [platform, setPlatform] = useState<Platform>("ios");
   const [sdkVersion, setSdkVersion] = useState("");
-  const [data, setData] = useState<CompatibilityResponse | null>(null);
+  const [data, setData] = useState<CompatibilityApiResponse | null>(null);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +107,7 @@ export default function Home() {
       const params = new URLSearchParams({ platform: targetPlatform });
       if (sdk) params.set("sdk", sdk);
       const response = await fetch(`/api/compatibility?${params}`, { cache: "no-store" });
-      const payload = (await response.json()) as CompatibilityResponse & { error?: string; detail?: string };
+      const payload = (await response.json()) as CompatibilityApiResponse & { error?: string; detail?: string };
       if (!response.ok) throw new Error(payload.detail ?? payload.error ?? "Request failed");
       setData(payload);
       setSdkVersion(payload.requestedSdkVersion);
@@ -145,12 +167,12 @@ export default function Home() {
         <div className="eyebrow"><ShieldCheck size={15} /> Publisher resource</div>
         <h1>Network compatibility,<br /><span>clearly mapped.</span></h1>
         <p className="hero-copy">
-          Check the ad network adapter versions supported by any AppHarbr SDK release—across iOS and Android.
+          Check the ad network adapter versions supported by any AppHarbr SDK release—across iOS, Android, and Unity.
         </p>
 
         <div className="controls-card">
           <div className="platform-tabs" role="tablist" aria-label="Platform">
-            {(["ios", "android"] as Platform[]).map((item) => (
+            {(["ios", "android", "unity"] as Platform[]).map((item) => (
               <button
                 key={item}
                 className={platform === item ? "active" : ""}
@@ -159,13 +181,13 @@ export default function Home() {
                 aria-selected={platform === item}
               >
                 <PlatformIcon platform={item} active={platform === item} />
-                {item === "ios" ? "iOS" : "Android"}
+                {platformLabel(item)}
               </button>
             ))}
           </div>
 
           <label className="version-select">
-            <span>AppHarbr SDK version</span>
+            <span>{platform === "unity" ? "AppHarbr Unity version" : "AppHarbr SDK version"}</span>
             <div>
               <select
                 value={sdkVersion}
@@ -204,7 +226,7 @@ export default function Home() {
           <article className="summary-card primary-summary">
             <span className="summary-label">Selected release</span>
             <strong>{sdkVersion || "—"}</strong>
-            <span>{platform === "ios" ? "iOS SDK" : "Android SDK"}</span>
+            <span>{platformLabel(platform)} SDK</span>
           </article>
           <article className="summary-card">
             <span className="summary-label">Supported networks</span>
@@ -212,9 +234,22 @@ export default function Home() {
             <span>at this SDK version</span>
           </article>
           <article className="summary-card">
-            <span className="summary-label">Latest referenced SDK</span>
-            <strong>{data?.latestReferencedSdkVersion ?? "—"}</strong>
-            <span>{data?.latestSdkVersionSource === "derived" ? "derived from compatibility rules" : "reported by source config"}</span>
+            {data?.platform === "unity" ? (
+              <>
+                <span className="summary-label">Native SDK versions</span>
+                <div className="native-sdk-pair">
+                  <strong>Android {data.nativeSdkVersions.android}</strong>
+                  <strong>iOS {data.nativeSdkVersions.ios}</strong>
+                </div>
+                <span>mapped to this Unity release</span>
+              </>
+            ) : (
+              <>
+                <span className="summary-label">Latest referenced SDK</span>
+                <strong>{data?.latestReferencedSdkVersion ?? "—"}</strong>
+                <span>{data?.latestSdkVersionSource === "derived" ? "derived from compatibility rules" : "reported by source config"}</span>
+              </>
+            )}
           </article>
           <article className="summary-card">
             <span className="summary-label">Source last updated</span>
@@ -227,8 +262,14 @@ export default function Home() {
           <div className="matrix-header">
             <div>
               <span className="section-kicker">Compatibility matrix</span>
-              <h2>{platform === "ios" ? "iOS" : "Android"} ad networks</h2>
-              <p>Supported adapter range for AppHarbr SDK {sdkVersion || "—"}</p>
+              <h2>{platformLabel(platform)} ad networks</h2>
+              {data?.platform === "unity" ? (
+                <p>
+                  Supported ranges for Unity {sdkVersion || "—"} using Android {data.nativeSdkVersions.android} and iOS {data.nativeSdkVersions.ios}
+                </p>
+              ) : (
+                <p>Supported adapter range for AppHarbr SDK {sdkVersion || "—"}</p>
+              )}
             </div>
             <label className="search-box">
               <Search size={17} />
@@ -242,28 +283,51 @@ export default function Home() {
           </div>
 
           <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Ad network</th>
-                  <th>Supported network versions</th>
-                  <th>Top supported version</th>
-                  <th>AppHarbr minimum version</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredNetworks.map((network) => (
-                  <tr key={network.id}>
-                    <td><div className="network-name"><NetworkMark name={network.name} /><div><strong>{network.name}</strong><span>{network.id}</span></div></div></td>
-                    <td><RangeCell network={network} /></td>
-                    <td className="mono-value top-supported">{network.topSupportedAdapter ?? "—"}</td>
-                    <td className="mono-value">{network.minimumAppHarbrForLatest ?? "—"}</td>
-                    <td>{network.supported ? <span className="status-badge"><Check size={13} /> Supported</span> : <span className="status-badge muted">Unavailable</span>}</td>
+            {data?.platform === "unity" ? (
+              <table className="unity-table">
+                <thead>
+                  <tr>
+                    <th>Ad network</th>
+                    <th>Android supported versions</th>
+                    <th>iOS supported versions</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {(filteredNetworks as UnityNetworkCompatibility[]).map((network) => (
+                    <tr key={network.id}>
+                      <td><div className="network-name"><NetworkMark name={network.name} /><div><strong>{network.name}</strong><span>{network.id}</span></div></div></td>
+                      <td><RangeCell network={network.android} /></td>
+                      <td><RangeCell network={network.ios} /></td>
+                      <td><UnityStatus network={network} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ad network</th>
+                    <th>Supported network versions</th>
+                    <th>Top supported version</th>
+                    <th>AppHarbr minimum version</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(filteredNetworks as NetworkCompatibility[]).map((network) => (
+                    <tr key={network.id}>
+                      <td><div className="network-name"><NetworkMark name={network.name} /><div><strong>{network.name}</strong><span>{network.id}</span></div></div></td>
+                      <td><RangeCell network={network} /></td>
+                      <td className="mono-value top-supported">{network.topSupportedAdapter ?? "—"}</td>
+                      <td className="mono-value">{network.minimumAppHarbrForLatest ?? "—"}</td>
+                      <td>{network.supported ? <span className="status-badge"><Check size={13} /> Supported</span> : <span className="status-badge muted">Unavailable</span>}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
             {!loading && filteredNetworks.length === 0 && (
               <div className="empty-state">No networks match “{query}”.</div>
             )}
@@ -290,7 +354,11 @@ export default function Home() {
 
         <div className="method-note">
           <strong>How to read this table</strong>
-          <p>The range spans the earliest through latest adapter version listed as compatible at or before the selected AppHarbr SDK version. Top supported version is the highest adapter version available for that network.</p>
+          {data?.platform === "unity" ? (
+            <p>Each Unity release maps to verified native Android and iOS SDK versions. The two ranges apply the same point-in-time compatibility rule independently for each OS; releases without a new mapping inherit the most recent verified native versions.</p>
+          ) : (
+            <p>The range spans the earliest through latest adapter version listed as compatible at or before the selected AppHarbr SDK version. Top supported version is the highest adapter version available for that network.</p>
+          )}
         </div>
       </section>
 

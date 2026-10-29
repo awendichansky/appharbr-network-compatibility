@@ -36,7 +36,7 @@ a { color: inherit; text-decoration: none; }
 .hero-copy { position: relative; z-index: 1; max-width: 640px; margin: 0; color: #dbe7ff; font-size: 17px; line-height: 1.6; }
 .controls-card { position: absolute; z-index: 4; left: 50%; bottom: -42px; transform: translateX(-50%); width: min(1200px, calc(100% - 48px)); min-height: 86px; display: grid; grid-template-columns: auto minmax(230px, 1fr) auto; gap: 14px; align-items: center; padding: 14px; background: #fff; color: var(--ink); border: 1px solid rgba(68,17,93,.08); border-radius: 16px; box-shadow: 0 18px 55px rgba(62,15,88,.18); }
 .platform-tabs { width: max-content; justify-self: start; display: flex; height: 56px; padding: 5px; background: #f0f3f8; border-radius: 11px; }
-.platform-tabs button { display: flex; align-items: center; gap: 8px; min-width: 115px; justify-content: center; border: 0; border-radius: 8px; color: #667085; background: transparent; cursor: pointer; font-weight: 680; }
+.platform-tabs button { display: flex; align-items: center; gap: 8px; min-width: 105px; justify-content: center; border: 0; border-radius: 8px; color: #667085; background: transparent; cursor: pointer; font-weight: 680; }
 .platform-tabs button.active { background: #fff; color: var(--blue); box-shadow: 0 2px 10px rgba(17,24,39,.08); }
 .platform-icon { width: 18px; height: 18px; object-fit: contain; }
 .version-select { min-width: 0; padding: 0 18px; border-left: 1px solid var(--line); }
@@ -59,6 +59,8 @@ a { color: inherit; text-decoration: none; }
 .primary-summary .summary-label { color: #cfe0ff; }
 .summary-card strong { font-size: 28px; letter-spacing: -.04em; line-height: 1.05; }
 .summary-card strong.date-value { font-size: 16px; line-height: 1.35; letter-spacing: -.01em; }
+.native-sdk-pair { display: grid; gap: 3px; }
+.native-sdk-pair strong { font-size: 15px; line-height: 1.25; letter-spacing: -.015em; }
 .summary-card > span:last-child { margin-top: 5px; color: var(--muted); font-size: 12px; }
 .primary-summary > span:last-child { color: #dbe7ff; }
 
@@ -88,7 +90,9 @@ tbody tr:hover { background: #fbfcff; }
 .range-dash { color: #98a2b3; }
 .unsupported { color: #98a2b3; font-size: 12px; }
 .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 99px; color: var(--green); background: #ebf9f2; font-size: 11px; font-weight: 750; }
+.status-badge.partial { color: #8a5a00; background: #fff7dd; }
 .status-badge.muted { color: #7b8496; background: #f1f3f6; }
+.unity-table .range-cell { min-width: 175px; }
 .empty-state, .loading-state { min-height: 150px; display: grid; place-items: center; color: var(--muted); font-size: 13px; }
 .loading-state { display: flex; justify-content: center; gap: 10px; }
 

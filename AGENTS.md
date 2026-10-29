@@ -7,6 +7,7 @@ This file is the durable context for agents working in this workspace. Read it b
 Build and maintain a publisher-facing AppHarbr compatibility resource that:
 
 - Shows supported ad-network adapter ranges for each AppHarbr SDK release on iOS and Android.
+- Shows Unity releases with their verified native Android/iOS SDK pair and OS-specific network ranges.
 - Exposes the normalized data through a JSON API for automated publisher checks.
 - Reads the live AppHarbr platform configuration rather than maintaining a separate compatibility database.
 - Uses AppHarbr branding and is suitable for eventual external-publisher access.
@@ -50,7 +51,10 @@ Re-read the Site with `mcp__codex_apps__sites_get_site` before any hosting or ac
 - The automation card shows both:
   - Platform-only request for all version anchors.
   - Platform plus optional `sdk` for a point-in-time result.
-- At tablet/desktop widths, the gray platform-tab background should fit the two buttons. At mobile widths it remains full width for usable tap targets.
+- At tablet/desktop widths, the gray platform-tab background should fit the three buttons. At mobile widths it remains full width for usable tap targets.
+- Unity is a third platform tab and uses the official Unity logo from Simple Icons.
+- Unity rows show Android and iOS supported network ranges side by side. Google AdMob and Google Ad Manager are presented as one Google row using the AdMob adapter range.
+- Unity releases without a new verified native compatibility entry inherit the most recent verified Android/iOS SDK pair at or before that release.
 
 ## Live upstream data
 
@@ -66,6 +70,8 @@ The response is an envelope whose `json` property contains the configuration. Th
 3. Plain JSON.
 
 Compatibility data is under `native_ad_support`.
+
+Unity release mappings are maintained in `lib/compatibility.ts` from the internal Unity Changelog. The current snapshot covers Unity `1.0.0` through `1.27.0`; it maps the latest release to Android `2.41.0` and iOS `1.38.0`. The publisher-facing response must not expose the internal changelog URL.
 
 Platform field mapping:
 
@@ -99,7 +105,7 @@ GET /api/compatibility?platform=android
 
 Supported query parameters:
 
-- `platform`: `ios` or `android`. Defaults to `ios`; invalid values return HTTP 400.
+- `platform`: `ios`, `android`, or `unity`. Defaults to `ios`; invalid values return HTTP 400.
 - `sdk`: optional AppHarbr SDK version. If omitted, calculations use the latest referenced SDK while `versionAnchors` still contains the complete history.
 - `network`: optional network ID or display name filter.
 
@@ -125,6 +131,15 @@ Important response fields:
 - `networks[].topSupportedAdapter`
 - `networks[].minimumAppHarbrForLatest`
 - `networks[].supported`
+
+Unity responses additionally include:
+
+- `nativeSdkVersions.android`
+- `nativeSdkVersions.ios`
+- `networks[].android`
+- `networks[].ios`
+
+For Unity, `sdk` is an AppHarbr Unity version. Each nested OS network object uses the same native compatibility schema as the iOS and Android responses.
 
 The route intentionally does not return the upstream URL.
 
@@ -179,6 +194,7 @@ Platform icons use Simple Icons CDN for Apple and Android.
 Current notable UI behavior:
 
 - Switching platform reloads live data and selects the latest visible SDK.
+- Unity selection resolves the mapped Android and iOS SDKs, loads both live configs, and combines networks into one OS-by-OS table.
 - Selecting a different SDK recalculates the table.
 - Search filters by normalized network name or ID.
 - `Copy request` copies the platform-only endpoint.
@@ -222,7 +238,8 @@ Verify:
 - Platform-only responses include full `versionAnchors` histories.
 - Invalid platforms return HTTP 400.
 - UI column order matches the approved order.
-- At a viewport near 872 px wide, the platform selector is approximately 240 px: two 115 px buttons plus 10 px total inner padding.
+- Unity `1.27.0` resolves to Android `2.41.0` and iOS `1.38.0`; the Google row shows both OS ranges.
+- At a viewport near 872 px wide, the platform selector should wrap only its three buttons plus the 10 px total inner padding.
 
 ## Tooling split: Claude Code and Codex
 
