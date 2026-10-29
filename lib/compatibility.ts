@@ -77,6 +77,8 @@ const EXCLUDED_SDK_VERSIONS: Partial<Record<NativePlatform, Set<string>>> = {
   android: new Set(["2.90.0"]),
 };
 
+const HIDDEN_NETWORK_IDS = new Set(["max"]);
+
 const DISPLAY_NAMES: Record<string, string> = {
   adcolony: "AdColony",
   admob: "AdMob",
@@ -92,7 +94,6 @@ const DISPLAY_NAMES: Record<string, string> = {
   googlenextgen: "Google Next Gen",
   inmobi: "InMobi",
   ironsource: "ironSource",
-  max: "AppLovin MAX",
   mintegral: "Mintegral",
   moloco: "Moloco",
   mytarget: "myTarget",
@@ -243,7 +244,11 @@ export async function getCompatibility(
 
   const normalized = Object.entries(support)
     .map(([id, entries]) => ({ id, entries: normalizeEntries(entries ?? []) }))
-    .filter((network) => network.entries.length > 0);
+    .filter(
+      (network) =>
+        network.entries.length > 0 &&
+        !HIDDEN_NETWORK_IDS.has(network.id.toLocaleLowerCase()),
+    );
   const excludedSdkVersions = EXCLUDED_SDK_VERSIONS[platform] ?? new Set<string>();
   const visibleNetworks = normalized.map(({ id, entries }) => ({
     id,

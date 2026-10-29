@@ -55,6 +55,7 @@ Re-read the Site with `mcp__codex_apps__sites_get_site` before any hosting or ac
 - Unity is a third platform tab and uses the official Unity logo from Simple Icons.
 - Unity rows show Android and iOS supported network ranges side by side. Google AdMob and Google Ad Manager are presented as one Google row using the AdMob adapter range.
 - Unity releases without a new verified native compatibility entry inherit the most recent verified Android/iOS SDK pair at or before that release.
+- Hide the `max` network (AppLovin MAX) on every platform while keeping the regular `applovin` network. Exclude `max` from both supported and total network counts.
 
 ## Live upstream data
 
